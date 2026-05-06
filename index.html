@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Аналитика чата</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Пиратская Станция</h1>
+    </header>
+
+    <main>
+      <section class="summary-grid" id="summaryGrid"></section>
+
+      <section class="layout-two">
+        <article class="panel panel-large">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Активность</p>
+              <h2>Нагрузка по дням</h2>
+            </div>
+            <span class="muted" id="dateRange"></span>
+          </div>
+          <canvas id="dailyChart" height="260"></canvas>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Активные пользователи</h2>
+            </div>
+          </div>
+          <div id="topUsersBars" class="bars"></div>
+        </article>
+      </section>
+
+      <section class="layout-two">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Медиа в сообщениях</h2>
+            </div>
+          </div>
+          <canvas id="mediaChart" height="250"></canvas>
+          <div class="legend" id="mediaLegend"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Файлы на диске</h2>
+            </div>
+          </div>
+          <div id="assetGrid" class="asset-grid"></div>
+        </article>
+      </section>
+
+      <section class="layout-two">
+        <article class="panel panel-large">
+          <div class="panel-head">
+            <div>
+              <h2>Активность по часам</h2>
+            </div>
+          </div>
+          <canvas id="hourChart" height="240"></canvas>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Дни недели и часы</h2>
+            </div>
+          </div>
+          <div id="heatmap" class="heatmap"></div>
+        </article>
+      </section>
+
+      <section class="layout-two">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Популярные слова</h2>
+            </div>
+          </div>
+          <div id="wordCloud" class="word-cloud"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Частые связки</h2>
+            </div>
+          </div>
+          <div class="stack-list" id="phraseList"></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Топ участников</h2>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-sort="name" class="sortable">Участник</th>
+                <th data-sort="messages" class="sortable">Сообщения</th>
+                <th data-sort="share" class="sortable">Доля</th>
+                <th data-sort="words" class="sortable">Слова</th>
+                <th data-sort="media" class="sortable">Медиа</th>
+                <th data-sort="replies" class="sortable">Ответы</th>
+                <th data-sort="avgWords" class="sortable">Сред. слов</th>
+                <th data-sort="topWord" class="sortable">Топ слово</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Самые нагруженные дни</h2>
+            </div>
+          </div>
+          <div class="stack-list" id="topDaysList"></div>
+      </section>
+    </main>
+
+    <script src="dashboard_data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
