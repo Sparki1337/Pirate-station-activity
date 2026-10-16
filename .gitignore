@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.tmp
+*.zip
+*.log
+temp_profile/
+test_render.png

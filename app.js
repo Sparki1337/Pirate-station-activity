@@ -1,4 +1,20 @@
-const data = window.CHAT_DASHBOARD_DATA;
+let currentDatasetKey = "archive";
+let data = null;
+
+const datasets = {
+  archive: {
+    id: "archive",
+    title: "Апрель — Май 2026",
+    badge: "Архив",
+    getData: () => window.CHAT_DATA_ARCHIVE || window.CHAT_DASHBOARD_DATA,
+  },
+  latest: {
+    id: "latest",
+    title: "Новая база (Октябрь 2026)",
+    badge: "Свежая",
+    getData: () => window.CHAT_DATA_LATEST,
+  },
+};
 
 const labels = {
   video_sticker: "Видео-стикеры",
@@ -467,7 +483,104 @@ function render() {
   renderLists();
 }
 
-render();
+function selectDataset(key) {
+  if (!datasets[key]) key = "archive";
+  currentDatasetKey = key;
+  try {
+    localStorage.setItem("pirate_dashboard_dataset", key);
+  } catch (e) {}
+
+  document.querySelectorAll(".switcher-btn").forEach((btn) => {
+    const isCurrent = btn.dataset.dataset === key;
+    btn.classList.toggle("active", isCurrent);
+    btn.setAttribute("aria-selected", isCurrent ? "true" : "false");
+  });
+
+  data = datasets[key].getData();
+  const emptyState = document.getElementById("emptyState");
+  const dashboardContent = document.getElementById("dashboardContent");
+
+  if (!data) {
+    if (emptyState) emptyState.style.display = "block";
+    if (dashboardContent) dashboardContent.style.display = "none";
+    return;
+  }
+
+  if (emptyState) emptyState.style.display = "none";
+  if (dashboardContent) dashboardContent.style.display = "block";
+
+  render();
+  requestAnimationFrame(renderCharts);
+}
+
+function initDatasetSwitcher() {
+  const latestData = window.CHAT_DATA_LATEST;
+  const latestSub = document.getElementById("latestSub");
+  const latestTag = document.getElementById("latestTag");
+  if (latestData && latestData.overview) {
+    if (latestSub) {
+      latestSub.textContent = `${shortDate(latestData.overview.dateStart)} — ${shortDate(latestData.overview.dateEnd)} · ${formatNumber(latestData.overview.analyzedMessages)} сообщ.`;
+    }
+    if (latestTag) {
+      latestTag.textContent = "Готово";
+    }
+  }
+
+  document.querySelectorAll(".switcher-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      selectDataset(btn.dataset.dataset);
+    });
+  });
+
+  const returnBtn = document.getElementById("btnReturnToArchive");
+  if (returnBtn) {
+    returnBtn.addEventListener("click", () => selectDataset("archive"));
+  }
+
+  const localInput = document.getElementById("localJsonInput");
+  if (localInput) {
+    localInput.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          window.CHAT_DATA_LATEST = parsed;
+          if (latestSub) latestSub.textContent = `Загружено · ${formatNumber(parsed.overview?.analyzedMessages || 0)} сообщ.`;
+          if (latestTag) latestTag.textContent = "Локально";
+          selectDataset("latest");
+        } catch (err) {
+          alert("Ошибка чтения JSON: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  let initial = "archive";
+  let hasSaved = false;
+  try {
+    const saved = window.localStorage?.getItem("pirate_dashboard_dataset");
+    if (saved && datasets[saved]) {
+      initial = saved;
+      hasSaved = true;
+    }
+  } catch (e) {}
+
+  if (window.location.hash === "#latest" || window.location.hash === "#archive") {
+    initial = window.location.hash.slice(1);
+  } else if (!hasSaved && window.CHAT_DATA_LATEST) {
+    initial = "latest";
+  }
+
+  selectDataset(initial);
+}
+
 initInteractions();
 initTableSort();
-window.addEventListener("resize", () => requestAnimationFrame(renderCharts));
+initDatasetSwitcher();
+window.addEventListener("resize", () => {
+  if (data) requestAnimationFrame(renderCharts);
+});
+

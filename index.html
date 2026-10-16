@@ -8,130 +8,208 @@
   </head>
   <body>
     <header class="topbar">
-      <h1>Пиратская Станция</h1>
+      <div class="topbar-inner">
+        <div class="topbar-brand">
+          <h1>Пиратская Станция</h1>
+        </div>
+
+        <div class="dataset-switcher" id="datasetSwitcher" role="tablist" aria-label="Выбор базы данных">
+          <button
+            type="button"
+            class="switcher-btn"
+            data-dataset="archive"
+            id="tabArchive"
+            role="tab"
+            aria-selected="false"
+          >
+            <span class="switcher-dot"></span>
+            <span class="switcher-text">
+              <span class="switcher-title">Апрель — Май 2026</span>
+              <span class="switcher-sub">06.04 — 06.05 · 49.4k сообщ.</span>
+            </span>
+            <span class="switcher-tag">Архив</span>
+          </button>
+
+          <button
+            type="button"
+            class="switcher-btn active"
+            data-dataset="latest"
+            id="tabLatest"
+            role="tab"
+            aria-selected="true"
+          >
+            <span class="switcher-dot live"></span>
+            <span class="switcher-text">
+              <span class="switcher-title">Новая база (Октябрь 2026)</span>
+              <span class="switcher-sub" id="latestSub">16.09 — 16.10 · 62.1k сообщ.</span>
+            </span>
+            <span class="switcher-tag new" id="latestTag">Свежая</span>
+          </button>
+        </div>
+      </div>
     </header>
 
     <main>
-      <section class="summary-grid" id="summaryGrid"></section>
-
-      <section class="layout-two">
-        <article class="panel panel-large">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Активность</p>
-              <h2>Нагрузка по дням</h2>
-            </div>
-            <span class="muted" id="dateRange"></span>
+      <div id="emptyState" class="panel empty-state" style="display: none;">
+        <div class="empty-state-card">
+          <div class="empty-icon-pulse">
+            <span class="pulse-ring"></span>
+            <span class="empty-icon">⏳</span>
           </div>
-          <canvas id="dailyChart" height="260"></canvas>
-        </article>
-
-        <article class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>Активные пользователи</h2>
+          <h2>Экспорт новой базы в процессе</h2>
+          <p class="empty-desc">
+            Новые данные чата экспортируются из Telegram Desktop. Как только экспорт завершится и данные будут добавлены в проект, здесь сразу появится свежая интерактивная аналитика сообщества.
+          </p>
+          <div class="empty-steps">
+            <div class="empty-step done">
+              <span class="step-num">✓</span>
+              <span>Выбор параметров</span>
             </div>
-          </div>
-          <div id="topUsersBars" class="bars"></div>
-        </article>
-      </section>
-
-      <section class="layout-two">
-        <article class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>Медиа в сообщениях</h2>
+            <div class="empty-step active">
+              <span class="step-num">2</span>
+              <span>Экспорт HTML в Telegram</span>
+            </div>
+            <div class="empty-step">
+              <span class="step-num">3</span>
+              <span>Парсинг и публикация</span>
             </div>
           </div>
-          <canvas id="mediaChart" height="250"></canvas>
-          <div class="legend" id="mediaLegend"></div>
-        </article>
-
-        <article class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>Файлы на диске</h2>
-            </div>
-          </div>
-          <div id="assetGrid" class="asset-grid"></div>
-        </article>
-      </section>
-
-      <section class="layout-two">
-        <article class="panel panel-large">
-          <div class="panel-head">
-            <div>
-              <h2>Активность по часам</h2>
-            </div>
-          </div>
-          <canvas id="hourChart" height="240"></canvas>
-        </article>
-
-        <article class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>Дни недели и часы</h2>
-            </div>
-          </div>
-          <div id="heatmap" class="heatmap"></div>
-        </article>
-      </section>
-
-      <section class="layout-two">
-        <article class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>Популярные слова</h2>
-            </div>
-          </div>
-          <div id="wordCloud" class="word-cloud"></div>
-        </article>
-
-        <article class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>Частые связки</h2>
-            </div>
-          </div>
-          <div class="stack-list" id="phraseList"></div>
-        </article>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <div>
-            <h2>Топ участников</h2>
+          <div class="empty-actions">
+            <button type="button" class="btn-return" id="btnReturnToArchive">
+              ← Посмотреть базу «Апрель — Май 2026»
+            </button>
+            <label class="btn-upload" title="Загрузить локальный chat_dashboard_data.json для предпросмотра">
+              <input type="file" id="localJsonInput" accept=".json" style="display: none;" />
+              Или открыть JSON вручную
+            </label>
           </div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th data-sort="name" class="sortable">Участник</th>
-                <th data-sort="messages" class="sortable">Сообщения</th>
-                <th data-sort="share" class="sortable">Доля</th>
-                <th data-sort="words" class="sortable">Слова</th>
-                <th data-sort="media" class="sortable">Медиа</th>
-                <th data-sort="replies" class="sortable">Ответы</th>
-                <th data-sort="avgWords" class="sortable">Сред. слов</th>
-                <th data-sort="topWord" class="sortable">Топ слово</th>
-              </tr>
-            </thead>
-            <tbody id="usersTable"></tbody>
-          </table>
-        </div>
-      </section>
+      </div>
 
-      <section class="panel">
+      <div id="dashboardContent">
+        <section class="summary-grid" id="summaryGrid"></section>
+
+        <section class="layout-two">
+          <article class="panel panel-large">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Активность</p>
+                <h2>Нагрузка по дням</h2>
+              </div>
+              <span class="muted" id="dateRange"></span>
+            </div>
+            <canvas id="dailyChart" height="260"></canvas>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Активные пользователи</h2>
+              </div>
+            </div>
+            <div id="topUsersBars" class="bars"></div>
+          </article>
+        </section>
+
+        <section class="layout-two">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Медиа в сообщениях</h2>
+              </div>
+            </div>
+            <canvas id="mediaChart" height="250"></canvas>
+            <div class="legend" id="mediaLegend"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Файлы на диске</h2>
+              </div>
+            </div>
+            <div id="assetGrid" class="asset-grid"></div>
+          </article>
+        </section>
+
+        <section class="layout-two">
+          <article class="panel panel-large">
+            <div class="panel-head">
+              <div>
+                <h2>Активность по часам</h2>
+              </div>
+            </div>
+            <canvas id="hourChart" height="240"></canvas>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Дни недели и часы</h2>
+              </div>
+            </div>
+            <div id="heatmap" class="heatmap"></div>
+          </article>
+        </section>
+
+        <section class="layout-two">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Популярные слова</h2>
+              </div>
+            </div>
+            <div id="wordCloud" class="word-cloud"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Частые связки</h2>
+              </div>
+            </div>
+            <div class="stack-list" id="phraseList"></div>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Топ участников</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-sort="name" class="sortable">Участник</th>
+                  <th data-sort="messages" class="sortable">Сообщения</th>
+                  <th data-sort="share" class="sortable">Доля</th>
+                  <th data-sort="words" class="sortable">Слова</th>
+                  <th data-sort="media" class="sortable">Медиа</th>
+                  <th data-sort="replies" class="sortable">Ответы</th>
+                  <th data-sort="avgWords" class="sortable">Сред. слов</th>
+                  <th data-sort="topWord" class="sortable">Топ слово</th>
+                </tr>
+              </thead>
+              <tbody id="usersTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
           <div class="panel-head">
             <div>
               <h2>Самые нагруженные дни</h2>
             </div>
           </div>
           <div class="stack-list" id="topDaysList"></div>
-      </section>
+        </section>
+      </div>
     </main>
 
+    <script src="dashboard_data_archive.js"></script>
+    <script src="dashboard_data_latest.js"></script>
     <script src="dashboard_data.js"></script>
     <script src="app.js"></script>
   </body>
